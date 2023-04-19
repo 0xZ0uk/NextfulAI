@@ -11,6 +11,7 @@ export const model = new ChatOpenAI({
 });
 
 export const embeddingModel = new OpenAIEmbeddings({
+  modelName: "text-embedding-ada-002",
   openAIApiKey: env.OPENAI_API_KEY,
   maxConcurrency: 5,
 });
