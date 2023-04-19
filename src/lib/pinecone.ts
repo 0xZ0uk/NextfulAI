@@ -20,9 +20,10 @@ export const getMatchesFromEmbeddings = async (
   embeddings: number[],
   topK: number
 ): Promise<ScoredVector[]> => {
-  if (!process.env.PINECONE_INDEX_NAME) {
+  if (!env.PINECONE_INDEX) {
     throw new Error("PINECONE_INDEX_NAME is not set");
   }
+
   const queryRequest = {
     vector: embeddings,
     topK,

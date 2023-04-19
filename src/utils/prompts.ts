@@ -65,7 +65,7 @@ const templates = {
 
     USER PROMPT: {userPrompt}
 
-     
+    CONVERSATION LOG: {conversationHistory}
 
     Final answer:
     `,

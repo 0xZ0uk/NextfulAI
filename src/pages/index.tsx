@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/restrict-plus-operands */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @next/next/no-img-element */
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { type NextPage } from "next";
@@ -6,16 +10,52 @@ import { api } from "@/utils/api";
 import React from "react";
 import Input from "@/components/Input";
 import Chat from "@/components/Chat";
-import type { BaseChatMessage } from "@/utils/types";
+import type { BaseChatMessage, ConversationEntry } from "@/utils/types";
 import { RxGear } from "react-icons/rx";
 import Drawer from "@/components/Drawer";
+import { useChannel } from "@ably-labs/react-hooks";
+import type { Types } from "ably";
+
+const updateChatbotMessage = (
+  conversation: ConversationEntry[],
+  message: Types.Message
+): ConversationEntry[] => {
+  const interactionId = message.data.interactionId;
+
+  const updatedConversation = conversation.reduce(
+    (acc: ConversationEntry[], e: ConversationEntry) => [
+      ...acc,
+      e.id === interactionId
+        ? { ...e, message: e.message + message.data.token }
+        : e,
+    ],
+    []
+  );
+
+  return conversation.some((e) => e.id === interactionId)
+    ? updatedConversation
+    : [
+        ...updatedConversation,
+        {
+          id: interactionId,
+          message: message.data.token,
+          speaker: "assistant",
+          date: new Date(),
+        },
+      ];
+};
 
 const Home: NextPage = () => {
   const [open, setOpen] = React.useState<boolean>(false);
 
   const [input, setInput] = React.useState<string>("");
-  const [messages, setMessages] = React.useState<BaseChatMessage[]>([]);
+  const [conversation, setConversation] = React.useState<ConversationEntry[]>(
+    []
+  );
   const [crawlUrl, seCrawlUrl] = React.useState<string>("");
+  const [statusMessage, setStatusMessage] = React.useState(
+    "Waiting for query..."
+  );
 
   const { mutate: upsert } = api.vectorDB.upsert.useMutation();
   const { mutate: chat, data: reply } = api.chat.chat.useMutation();
@@ -42,32 +82,47 @@ const Home: NextPage = () => {
   };
 
   const onSubmitInput = () => {
-    setMessages([
-      ...messages,
+    setConversation((state) => [
+      ...state,
       {
-        role: "user",
-        text: input,
+        message: input,
+        speaker: "user",
+        date: new Date(),
       },
     ]);
-    chat({ message: input });
+
+    chat({ prompt: input, conversation });
     setInput("");
   };
+
+  useChannel("default", (message) => {
+    switch (message.data.event) {
+      case "response":
+        setConversation((state) => updateChatbotMessage(state, message));
+        break;
+      case "status":
+        setStatusMessage(message.data.message);
+        break;
+      case "responseEnd":
+      default:
+        setStatusMessage("Waiting for query...");
+    }
+  });
 
   React.useEffect(() => {
     if (
       !!reply &&
       reply.data.text !== "" &&
-      reply.data.text !== messages[messages.length - 1]?.text
+      reply.data.text !== conversation[conversation.length - 1]?.message
     ) {
-      setMessages([
-        ...messages,
+      setConversation((state) => [
+        ...state,
         {
-          role: "assistant",
-          text: reply.data.text as string,
+          message: reply.data.text as string,
+          speaker: "assistant",
+          date: new Date(),
         },
       ]);
-
-      console.log("message added", reply);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reply]);
@@ -104,7 +159,7 @@ const Home: NextPage = () => {
               AI documentation for Contentful and NextJS powered by ChatGPT
             </p>
           </div>
-          <Chat messages={messages} />
+          <Chat messages={conversation} />
           <Input
             value={input}
             placeholder="Ask any question related to Contentful or NextJS"

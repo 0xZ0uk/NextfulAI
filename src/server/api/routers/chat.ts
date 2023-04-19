@@ -19,7 +19,7 @@ const llm = new OpenAI({});
 
 export const chatRouter = createTRPCRouter({
   chat: publicProcedure
-    .input(z.object({ message: z.string() }))
+    .input(z.object({ prompt: z.string(), conversation: z.array(z.any()) }))
     .mutation(async ({ input }) => {
       try {
         const channel = ably.channels.get("default");
@@ -29,12 +29,13 @@ export const chatRouter = createTRPCRouter({
           llm,
           prompt: new PromptTemplate({
             template: templates.inquiryTemplate,
-            inputVariables: ["userPrompt"],
+            inputVariables: ["userPrompt", "conversationHistory"],
           }),
         });
 
         const inquiryChainResult = await inquiryChain.call({
-          userPrompt: prompt,
+          userPrompt: input.prompt,
+          conversationHistory: input.conversation,
         });
 
         const inquiry = inquiryChainResult.text;
@@ -138,7 +139,6 @@ export const chatRouter = createTRPCRouter({
           modelName: "gpt-3.5-turbo",
           callbackManager: CallbackManager.fromHandlers({
             async handleLLMNewToken(token) {
-              console.log(token);
               channel.publish({
                 data: {
                   event: "response",
@@ -166,7 +166,8 @@ export const chatRouter = createTRPCRouter({
 
         const res = await chain.call({
           summaries: summary,
-          question: prompt,
+          conversationHistory: input.conversation,
+          question: input.prompt,
           urls,
         });
 

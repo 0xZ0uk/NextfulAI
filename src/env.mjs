@@ -18,6 +18,7 @@ const server = z.object({
  */
 const client = z.object({
   NEXT_PUBLIC_ABLY_API_KEY: z.string(),
+  NEXT_PUBLIC_API_ROOT: z.string(),
 });
 
 /**
@@ -33,6 +34,7 @@ const processEnv = {
   PINECONE_ENVIRONMENT: process.env.PINECONE_ENVIRONMENT,
   PINECONE_INDEX: process.env.PINECONE_INDEX,
   NEXT_PUBLIC_ABLY_API_KEY: process.env.NEXT_PUBLIC_ABLY_API_KEY,
+  NEXT_PUBLIC_API_ROOT: process.env.NEXT_PUBLIC_API_ROOT,
 };
 
 // Don't touch the part below

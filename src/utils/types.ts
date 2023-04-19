@@ -8,3 +8,14 @@ export type Metadata = {
   text: string;
   chunk: string;
 };
+
+export type ConversationEntry = {
+  message: string;
+  speaker: "assistant" | "user";
+  date: Date;
+  id?: string;
+};
+
+export type request = {
+  prompt: string;
+};
