@@ -1,6 +1,6 @@
 /* eslint-disable react/no-children-prop */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import type { BaseChatMessage, ConversationEntry } from "@/utils/types";
+import type { ConversationEntry } from "@/utils/types";
 import clsx from "clsx";
 import React from "react";
 import ReactMarkdown from "react-markdown";
@@ -27,23 +27,30 @@ const Chat: React.FC<ChatProps> = ({ messages }) => {
           >
             <ReactMarkdown
               children={msg.message}
+              className="leading-relaxed"
               components={{
-                code({ inline, className, children, ...props }) {
-                  const match = /language-(\w+)/.exec(className || "");
-                  return !inline && match ? (
+                code({ inline, children, ...props }) {
+                  return (
                     <SyntaxHighlighter
                       {...props}
                       children={String(children).replace(/\n$/, "")}
                       style={dracula}
-                      language={match[1]}
+                      language={"typescript"}
                       wrapLines
+                      useInlineStyles={inline}
                       wrapLongLines
-                      PreTag="div"
                     />
-                  ) : (
-                    <code {...props} className={className}>
+                  );
+                },
+                a({ children, ...props }) {
+                  return (
+                    <a
+                      {...props}
+                      target="_blank"
+                      className="rounded-md bg-slate-700 p-1 text-sm text-blue-500"
+                    >
                       {children}
-                    </code>
+                    </a>
                   );
                 },
               }}

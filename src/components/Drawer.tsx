@@ -12,8 +12,8 @@ const Drawer: React.FC<DrawerProps> = ({ children, open, onClose }) => {
   return (
     <div
       className={clsx(
-        "absolute right-0 h-full w-1/3 bg-slate-100 transition-all",
-        open ? "w-1/3" : "-right-1/3"
+        "absolute h-full w-1/3 bg-slate-100 transition-all",
+        open ? "right-0" : "-right-1/3"
       )}
     >
       <button

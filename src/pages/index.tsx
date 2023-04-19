@@ -113,6 +113,7 @@ const Home: NextPage = () => {
     if (
       !!reply &&
       reply.data.text !== "" &&
+      conversation[conversation.length - 1]?.speaker === "user" &&
       reply.data.text !== conversation[conversation.length - 1]?.message
     ) {
       setConversation((state) => [
