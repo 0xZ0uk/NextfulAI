@@ -5,7 +5,7 @@ import clsx from "clsx";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { dracula } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { dracula } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 interface ChatProps {
   messages: BaseChatMessage[];
@@ -28,7 +28,7 @@ const Chat: React.FC<ChatProps> = ({ messages }) => {
             <ReactMarkdown
               children={msg.text}
               components={{
-                code({ node, inline, className, children, ...props }) {
+                code({ inline, className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || "");
                   return !inline && match ? (
                     <SyntaxHighlighter
