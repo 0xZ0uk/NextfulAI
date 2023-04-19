@@ -4,13 +4,13 @@ import { PineconeClient } from "@pinecone-database/pinecone";
 const initializePinecone = async () => {
   const pinecone = new PineconeClient();
   await pinecone.init({
-    apiKey: env.NEXT_PUBLIC_PINECONE_API_KEY,
-    environment: env.NEXT_PUBLIC_PINECONE_ENVIRONMENT,
+    apiKey: env.PINECONE_API_KEY,
+    environment: env.PINECONE_ENVIRONMENT,
   });
   return pinecone;
 };
 
 const pinecone = await initializePinecone();
-export const pineconeIndex = pinecone.Index(env.NEXT_PUBLIC_PINECONE_INDEX);
+export const pineconeIndex = pinecone.Index(env.PINECONE_INDEX);
 
 export default pinecone;

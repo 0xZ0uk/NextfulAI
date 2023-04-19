@@ -9,7 +9,6 @@ import Chat from "@/components/Chat";
 import type { BaseChatMessage } from "@/utils/types";
 import { RxGear } from "react-icons/rx";
 import Drawer from "@/components/Drawer";
-import { env } from "@/env.mjs";
 
 const Home: NextPage = () => {
   const [open, setOpen] = React.useState<boolean>(false);

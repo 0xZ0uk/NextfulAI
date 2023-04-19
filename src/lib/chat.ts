@@ -6,12 +6,12 @@ import { PineconeStore } from "langchain/vectorstores/pinecone";
 import { pineconeIndex } from "./pinecone";
 
 export const model = new ChatOpenAI({
-  openAIApiKey: env.NEXT_PUBLIC_OPENAI_API_KEY,
+  openAIApiKey: env.OPENAI_API_KEY,
   temperature: 0,
 });
 
 export const embeddingModel = new OpenAIEmbeddings({
-  openAIApiKey: env.NEXT_PUBLIC_OPENAI_API_KEY,
+  openAIApiKey: env.OPENAI_API_KEY,
   maxConcurrency: 5,
 });
 

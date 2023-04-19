@@ -17,10 +17,7 @@ const server = z.object({
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 const client = z.object({
-  NEXT_PUBLIC_OPENAI_API_KEY: z.string(),
-  NEXT_PUBLIC_PINECONE_API_KEY: z.string(),
-  NEXT_PUBLIC_PINECONE_ENVIRONMENT: z.string(),
-  NEXT_PUBLIC_PINECONE_INDEX: z.string(),
+  // NEXT_PUBLIC_OPENAI_API_KEY: z.string(),
 });
 
 /**
@@ -31,11 +28,6 @@ const client = z.object({
  */
 const processEnv = {
   NODE_ENV: process.env.NODE_ENV,
-  NEXT_PUBLIC_OPENAI_API_KEY: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-  NEXT_PUBLIC_PINECONE_API_KEY: process.env.NEXT_PUBLIC_PINECONE_API_KEY,
-  NEXT_PUBLIC_PINECONE_ENVIRONMENT:
-    process.env.NEXT_PUBLIC_PINECONE_ENVIRONMENT,
-  NEXT_PUBLIC_PINECONE_INDEX: process.env.NEXT_PUBLIC_PINECONE_INDEX,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   PINECONE_API_KEY: process.env.PINECONE_API_KEY,
   PINECONE_ENVIRONMENT: process.env.PINECONE_ENVIRONMENT,
