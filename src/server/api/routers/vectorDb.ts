@@ -7,11 +7,8 @@ import TurndownService from "turndown";
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { MarkdownTextSplitter } from "langchain/text_splitter";
-import { PineconeStore } from "langchain/vectorstores";
 import { Document } from "langchain/document";
-import { embeddingModel } from "@/lib/chat";
-import pinecone from "@/lib/pinecone";
-import { env } from "@/env.mjs";
+import { vectorStore } from "@/lib/chat";
 
 export const vectorDBRouter = createTRPCRouter({
   upsert: publicProcedure
@@ -21,8 +18,6 @@ export const vectorDBRouter = createTRPCRouter({
         const response = await fetch(input.url, { mode: "no-cors" });
         const htmlToString = await response.text();
         const $ = cheerio.load(htmlToString);
-
-        const pineconeIndex = pinecone.Index(env.NEXT_PUBLIC_PINECONE_INDEX);
 
         const $elements = $(
           "h1, h2, h3, h4, h5, h6, p, li, blockquote, code, pre"
@@ -50,11 +45,6 @@ export const vectorDBRouter = createTRPCRouter({
             pageContent: chunk,
           });
         });
-
-        const vectorStore = await PineconeStore.fromExistingIndex(
-          embeddingModel,
-          { pineconeIndex }
-        );
 
         await vectorStore.addDocuments(docs);
 
