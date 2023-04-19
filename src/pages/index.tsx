@@ -1,0 +1,153 @@
+/* eslint-disable @next/next/no-img-element */
+/* eslint-disable @typescript-eslint/no-misused-promises */
+import { type NextPage } from "next";
+import Head from "next/head";
+import { api } from "@/utils/api";
+import React from "react";
+import Input from "@/components/Input";
+import Chat from "@/components/Chat";
+import type { BaseChatMessage } from "@/utils/types";
+import { RxGear } from "react-icons/rx";
+import Drawer from "@/components/Drawer";
+import { env } from "@/env.mjs";
+
+const Home: NextPage = () => {
+  const [open, setOpen] = React.useState<boolean>(false);
+
+  const [input, setInput] = React.useState<string>("");
+  const [messages, setMessages] = React.useState<BaseChatMessage[]>([]);
+  const [crawlUrl, seCrawlUrl] = React.useState<string>("");
+
+  const { mutate: upsert } = api.vectorDB.upsert.useMutation();
+  const { mutate: chat, data: reply } = api.chat.chat.useMutation();
+
+  const { mutate: spider, data: crawled } = api.vectorDB.spider.useMutation();
+
+  const onUpsertAll = () => {
+    if (crawled?.data) {
+      crawled.data.map((c) => {
+        upsert({ url: "https://" + c });
+      });
+    }
+  };
+
+  const onSpiderCrawl = () => {
+    spider({
+      sitemap: crawlUrl,
+      match: "/docs/",
+    });
+  };
+
+  const onChangeInput = (value: string) => {
+    setInput(value);
+  };
+
+  const onSubmitInput = () => {
+    setMessages([
+      ...messages,
+      {
+        role: "user",
+        text: input,
+      },
+    ]);
+    chat({ message: input });
+    setInput("");
+  };
+
+  React.useEffect(() => {
+    if (
+      !!reply &&
+      reply.data.text !== "" &&
+      reply.data.text !== messages[messages.length - 1]?.text
+    ) {
+      setMessages([
+        ...messages,
+        {
+          role: "assistant",
+          text: reply.data.text as string,
+        },
+      ]);
+
+      console.log("message added", reply);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reply]);
+
+  return (
+    <>
+      <Head>
+        <title>Contentful + NextJS AI Docs</title>
+        <meta
+          name="description"
+          content="A LLM powered documentation for Contentful and NextJS"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white from-70% to-stone-300">
+        <div className="flex w-1/2 flex-col gap-4">
+          <div className="flex flex-col items-center gap-6">
+            <div className="flex items-center justify-center gap-4">
+              <img
+                src="https://www.contentful.com/developers/_assets/logo.74f883e83b.svg"
+                alt="Contentful"
+                height={50}
+                width={50}
+              />
+              +
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Nextjs-logo.svg/788px-Nextjs-logo.svg.png"
+                alt="NextJS"
+                height={100}
+                width={100}
+              />
+            </div>
+            <p className="text-sm text-slate-500">
+              AI documentation for Contentful and NextJS powered by ChatGPT
+            </p>
+          </div>
+          <Chat messages={messages} />
+          <Input
+            value={input}
+            placeholder="Ask any question related to Contentful or NextJS"
+            onChange={onChangeInput}
+            onSubmit={onSubmitInput}
+          />
+        </div>
+        {process.env.NODE_ENV !== "production" && (
+          <>
+            <div
+              className="absolute bottom-8 right-8 flex h-16 w-16 cursor-pointer items-center justify-center rounded-full bg-slate-900 text-3xl text-slate-50"
+              onClick={() => setOpen(true)}
+            >
+              <RxGear className="mx-auto" />
+            </div>
+            <Drawer open={open} onClose={() => setOpen(false)}>
+              <div>
+                <h1 className="mb-4 text-sm font-bold uppercase tracking-widest text-slate-600">
+                  Debug Menu:
+                </h1>
+                <Input
+                  label="Sitemap URL"
+                  value={crawlUrl}
+                  extra={`Crawled: ${crawled?.data.length || 0}`}
+                  placeholder="URL to crawl"
+                  onChange={(value) => seCrawlUrl(value)}
+                  onSubmit={onSpiderCrawl}
+                />
+                <button
+                  className="text-slate h-12 w-full rounded-md bg-slate-900 text-slate-50 disabled:bg-slate-700 disabled:text-slate-500"
+                  disabled={!crawled?.data || crawled?.data.length < 1}
+                  onClick={onUpsertAll}
+                >
+                  Upsert Crawled
+                </button>
+              </div>
+            </Drawer>
+          </>
+        )}
+      </main>
+    </>
+  );
+};
+
+export default Home;
