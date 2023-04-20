@@ -15,6 +15,7 @@ import { RxGear } from "react-icons/rx";
 import Drawer from "@/components/Drawer";
 import { useChannel } from "@ably-labs/react-hooks";
 import type { Types } from "ably";
+import { env } from "@/env.mjs";
 
 const updateChatbotMessage = (
   conversation: ConversationEntry[],
@@ -142,11 +143,13 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white from-70% to-stone-300">
-        <div className="absolute left-8 top-8 w-96 rounded-md bg-red-500 p-4 text-white">
-          <strong>WARNING:</strong> Due to my Vercel &quot;Hobby Plan&quot;
-          requests to the API will TimeOut after 10 seconds, and AI messages may
-          be imcomplete.
-        </div>
+        {process.env.NODE_ENV === "production" && (
+          <div className="absolute left-8 top-8 w-96 rounded-md bg-red-500 p-4 text-white">
+            <strong>WARNING:</strong> Due to my Vercel &quot;Hobby Plan&quot;
+            requests to the API will TimeOut after 10 seconds, and AI messages
+            may be imcomplete.
+          </div>
+        )}
         <div className="flex w-1/2 flex-col gap-4">
           <div className="flex flex-col items-center gap-6">
             <div className="flex items-center justify-center gap-4">
