@@ -10,12 +10,11 @@ import { api } from "@/utils/api";
 import React from "react";
 import Input from "@/components/Input";
 import Chat from "@/components/Chat";
-import type { BaseChatMessage, ConversationEntry } from "@/utils/types";
+import type { ConversationEntry } from "@/utils/types";
 import { RxGear } from "react-icons/rx";
 import Drawer from "@/components/Drawer";
 import { useChannel } from "@ably-labs/react-hooks";
 import type { Types } from "ably";
-import { env } from "@/env.mjs";
 
 const updateChatbotMessage = (
   conversation: ConversationEntry[],
@@ -142,7 +141,7 @@ const Home: NextPage = () => {
         />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white from-70% to-stone-300">
+      <main className="flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-white from-70% to-stone-300">
         {process.env.NODE_ENV === "production" && (
           <div className="absolute left-8 top-8 w-96 rounded-md bg-red-500 p-4 text-white">
             <strong>WARNING:</strong> Due to my Vercel &quot;Hobby Plan&quot;
@@ -177,7 +176,7 @@ const Home: NextPage = () => {
           <Chat messages={conversation} loading={aiLoading} />
           <Input
             value={input}
-            placeholder="Ask any question related to Contentful or NextJS"
+            placeholder={statusMessage}
             onChange={onChangeInput}
             onSubmit={onSubmitInput}
           />

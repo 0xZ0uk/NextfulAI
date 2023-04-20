@@ -3,6 +3,7 @@ import { configureAbly } from "@ably-labs/react-hooks";
 import { api } from "@/utils/api";
 import "@/styles/globals.css";
 import { env } from "@/env.mjs";
+import { Analytics } from "@vercel/analytics/react";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const prefix = env.NEXT_PUBLIC_API_ROOT || "/";
@@ -18,7 +19,12 @@ configureAbly({
 });
 
 const MyApp: AppType = ({ Component, pageProps }) => {
-  return <Component {...pageProps} />;
+  return (
+    <>
+      <Component {...pageProps} />
+      <Analytics />
+    </>
+  );
 };
 
 export default api.withTRPC(MyApp);
