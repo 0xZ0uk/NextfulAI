@@ -47,7 +47,7 @@ const updateChatbotMessage = (
 
 const Home: NextPage = () => {
   const [open, setOpen] = React.useState<boolean>(false);
-
+  const [aiLoading, setAiLoading] = React.useState<boolean>(false);
   const [input, setInput] = React.useState<string>("");
   const [conversation, setConversation] = React.useState<ConversationEntry[]>(
     []
@@ -82,6 +82,7 @@ const Home: NextPage = () => {
   };
 
   const onSubmitInput = () => {
+    setAiLoading(true);
     setConversation((state) => [
       ...state,
       {
@@ -92,6 +93,7 @@ const Home: NextPage = () => {
     ]);
 
     chat({ prompt: input, conversation });
+    setAiLoading(false);
     setInput("");
   };
 
@@ -105,6 +107,7 @@ const Home: NextPage = () => {
         break;
       case "responseEnd":
       default:
+        setAiLoading(false);
         setStatusMessage("Waiting for query...");
     }
   });
@@ -139,6 +142,11 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-white from-70% to-stone-300">
+        <div className="absolute left-8 top-8 w-96 rounded-md bg-red-500 p-4 text-white">
+          <strong>WARNING:</strong> Due to my Vercel &quot;Hobby Plan&quot;
+          requests to the API will TimeOut after 10 seconds, and AI messages may
+          be imcomplete.
+        </div>
         <div className="flex w-1/2 flex-col gap-4">
           <div className="flex flex-col items-center gap-6">
             <div className="flex items-center justify-center gap-4">
@@ -155,12 +163,15 @@ const Home: NextPage = () => {
                 height={100}
                 width={100}
               />
+              <div className="relative top-4 rounded-md bg-slate-950 p-1 text-xs text-slate-100">
+                BETA
+              </div>
             </div>
             <p className="text-sm text-slate-500">
               AI documentation for Contentful and NextJS powered by ChatGPT
             </p>
           </div>
-          <Chat messages={conversation} />
+          <Chat messages={conversation} loading={aiLoading} />
           <Input
             value={input}
             placeholder="Ask any question related to Contentful or NextJS"

@@ -9,9 +9,10 @@ import { dracula } from "react-syntax-highlighter/dist/cjs/styles/prism";
 
 interface ChatProps {
   messages: ConversationEntry[];
+  loading?: boolean;
 }
 
-const Chat: React.FC<ChatProps> = ({ messages }) => {
+const Chat: React.FC<ChatProps> = ({ messages, loading }) => {
   return (
     <div className="h-[680px] w-full overflow-y-auto rounded-md border border-stone-300/50 p-4 shadow-inner">
       <div className="flex w-full flex-col gap-3">
@@ -57,6 +58,7 @@ const Chat: React.FC<ChatProps> = ({ messages }) => {
             />
           </div>
         ))}
+        {loading && <div>...</div>}
       </div>
     </div>
   );
